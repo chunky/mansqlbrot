@@ -41,10 +41,7 @@ public class MainWindow extends javax.swing.JFrame {
         displayArea.setFont(new Font("monospaced", Font.PLAIN, 12));
         
         colorInput.setText(defaultColors);
-        
-        final FontMetrics fontMetrics = displayArea.getFontMetrics(displayArea.getFont());
-        oneCharWidth = (double) fontMetrics.charWidth('M');
-        oneCharHeight = (double)fontMetrics.getHeight();
+        calculateCharWidths();
         colors = defaultColors;
         
         try {
@@ -54,6 +51,17 @@ public class MainWindow extends javax.swing.JFrame {
         } catch (SQLException | ClassNotFoundException ex) {
             Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    public void updateFont() {
+        displayArea.setFont(displayArea.getFont().deriveFont((float)(Integer)charSizeSpinner.getValue()));
+    }
+    
+    private void calculateCharWidths() {
+        final FontMetrics fontMetrics = displayArea.getFontMetrics(displayArea.getFont());
+        oneCharWidth = (double) fontMetrics.charWidth('M');
+        oneCharHeight = (double)fontMetrics.getHeight();
+        resetDimensions();
     }
     
     final static private String defaultColors = " .+*#";
@@ -100,32 +108,6 @@ public class MainWindow extends javax.swing.JFrame {
             }
         });
         
-        
-//        MyCaret c = (MyCaret) displayArea.getCaret();
-//        
-//        Double newCenterX = c.getCenterX();
-//        Double newCenterY = c.getCenterY();
-//        Double newWidth = c.getWidth();
-//        Double newHeight = c.getHeight();
-//
-//        Double prefWidth = (double)displayArea.getWidth();
-//        Double prefHeight = (double)displayArea.getHeight();
-//        
-//        System.out.println(minX + " " + maxX + "," + minY + " " + maxY);
-//        
-//        Double halfNewCwidth = (maxX-minX)*(newWidth/prefWidth);
-//        Double newCcenterX = (maxX-minX)*(newCenterX/prefWidth);
-//        minX = newCcenterX - halfNewCwidth;
-//        maxX = newCcenterX + halfNewCwidth;
-//        
-//        Double halfNewCheight = (maxY-minY)*(newHeight/prefHeight);
-//        Double newCcenterY = (maxY-minY)*(newCenterY/prefHeight);
-//        minY = newCcenterY - halfNewCheight;
-//        maxY = newCcenterY + halfNewCheight;
-//        
-//        System.out.println(minX + " " + maxX + "," + minY + " " + maxY);
-//        System.out.println();
-
     }
     
     public void resetDimensions() {
@@ -138,6 +120,12 @@ public class MainWindow extends javax.swing.JFrame {
         final int prefHeight = displayArea.getHeight();
         width = (double) (prefWidth / oneCharWidth) - 1.0;
         height = (double) (prefHeight / oneCharHeight) - 4.0;
+        
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                updateDisplay();
+            }
+        });
     }
     
     public void updateDisplay() {
@@ -203,7 +191,10 @@ public class MainWindow extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         displayArea = new javax.swing.JTextArea();
         jButton1 = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
         colorInput = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
+        charSizeSpinner = new javax.swing.JSpinner();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("ManSQLBrot");
@@ -232,16 +223,42 @@ public class MainWindow extends javax.swing.JFrame {
         gridBagConstraints.weighty = 1.0;
         getContentPane().add(jScrollPane1, gridBagConstraints);
 
-        jButton1.setText("Reset");
+        jButton1.setText("Reset Zoom");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
             }
         });
-        getContentPane().add(jButton1, new java.awt.GridBagConstraints());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.weightx = 1.0;
+        getContentPane().add(jButton1, gridBagConstraints);
+
+        jLabel2.setText("\"Colors\":");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        getContentPane().add(jLabel2, gridBagConstraints);
 
         colorInput.setText("jTextField1");
-        getContentPane().add(colorInput, new java.awt.GridBagConstraints());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.weightx = 1.0;
+        getContentPane().add(colorInput, gridBagConstraints);
+
+        jLabel1.setText("Font Size:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        getContentPane().add(jLabel1, gridBagConstraints);
+
+        charSizeSpinner.setModel(new javax.swing.SpinnerNumberModel(12, 1, 20, 1));
+        charSizeSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                charSizeSpinnerStateChanged(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.weightx = 1.0;
+        getContentPane().add(charSizeSpinner, gridBagConstraints);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -252,16 +269,17 @@ public class MainWindow extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         resetDimensions();
-        displayArea.setCaretPosition(0);
-        displayArea.setSelectionEnd(0);
-        displayArea.setSelectionStart(0);
-        updateDisplay();
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void displayAreaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_displayAreaMouseClicked
-
         updateDimensions();
     }//GEN-LAST:event_displayAreaMouseClicked
+
+    private void charSizeSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_charSizeSpinnerStateChanged
+        updateFont();
+        calculateCharWidths();
+        updateDimensions();
+    }//GEN-LAST:event_charSizeSpinnerStateChanged
 
     /**
      * @param args the command line arguments
@@ -299,9 +317,12 @@ public class MainWindow extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JSpinner charSizeSpinner;
     private javax.swing.JTextField colorInput;
     private javax.swing.JTextArea displayArea;
     private javax.swing.JButton jButton1;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
 }
