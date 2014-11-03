@@ -269,6 +269,18 @@ public class MainWindow extends javax.swing.JFrame {
         jPanel1.add(jLabel2, gridBagConstraints);
 
         colorInput.setText("jTextField1");
+        colorInput.setMinimumSize(new java.awt.Dimension(80, 19));
+        colorInput.setPreferredSize(new java.awt.Dimension(80, 21));
+        colorInput.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                colorInputActionPerformed(evt);
+            }
+        });
+        colorInput.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                colorInputPropertyChange(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.weightx = 1.0;
@@ -339,6 +351,14 @@ public class MainWindow extends javax.swing.JFrame {
     private void iterationSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_iterationSliderStateChanged
         updateDisplay();
     }//GEN-LAST:event_iterationSliderStateChanged
+
+    private void colorInputPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_colorInputPropertyChange
+        updateDisplay();
+    }//GEN-LAST:event_colorInputPropertyChange
+
+    private void colorInputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_colorInputActionPerformed
+        updateDisplay();
+    }//GEN-LAST:event_colorInputActionPerformed
 
     /**
      * @param args the command line arguments
